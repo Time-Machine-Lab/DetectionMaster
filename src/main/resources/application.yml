@@ -4,17 +4,17 @@ server:
 
 #  腾讯云
 tcyun:
-  secretId: AKIDW8oWI81w5UihilfaP2Vv98rOjtvmPuOq
-  secretKey: kUA70tocL6wt3AEAykNsCJDscaj1S2hN
+  secretId: 
+  secretKey: 
 
 
 #阿里云
 #aliyun:
-#  secretId: LTAI5tSBJDjWYyHtfE2HEGyN
-#  secretKey: jtIyL0fAF6ZgVIxUDXPtcJjvT2YHYr
+#  secretId:
+#  secretKey: 
 
 
 #阿里云ak
 aliyun:
-  secretId: LTAI5tFBzdovs8DgpwxFi2mP
-  secretKey: yW8sz7LhWKo63MNZBB8rdY1qDG1h24
+  secretId: 
+  secretKey: 
