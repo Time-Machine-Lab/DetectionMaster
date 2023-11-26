@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+
+#  腾讯云
+tcyun:
+  secretId: 
+  secretKey: 
+
+
+#阿里云
+#aliyun:
+#  secretId:
+#  secretKey: 
+
+
+#阿里云ak
+aliyun:
+  secretId: 
+  secretKey: 
