@@ -46,22 +46,22 @@ public class AliyunTextDetection {
         }
 
         // 打印检测结果。
-        if (response != null) {
-            if (response.getStatusCode() == 200) {
-                TextModerationResponseBody result = response.getBody();
-                System.out.println(JSON.toJSONString(result));
-                Integer code = result.getCode();
-                if (code != null && code == 200) {
-                    TextModerationResponseBody.TextModerationResponseBodyData data = result.getData();
-                    System.out.println("labels = [" + data.getLabels() + "]");
-                    System.out.println("reason = [" + data.getReason() + "]");
-                } else {
-                    System.out.println("text moderation not success. code:" + code);
-                }
-            } else {
-                System.out.println("response not success. status:" + response.getStatusCode());
-            }
-        }
+//        if (response != null) {
+//            if (response.getStatusCode() == 200) {
+//                TextModerationResponseBody result = response.getBody();
+//                System.out.println(JSON.toJSONString(result));
+//                Integer code = result.getCode();
+//                if (code != null && code == 200) {
+//                    TextModerationResponseBody.TextModerationResponseBodyData data = result.getData();
+//                    System.out.println("labels = [" + data.getLabels() + "]");
+//                    System.out.println("reason = [" + data.getReason() + "]");
+//                } else {
+//                    System.out.println("text moderation not success. code:" + code);
+//                }
+//            } else {
+//                System.out.println("response not success. status:" + response.getStatusCode());
+//            }
+//        }
         JSONObject  result =(JSONObject) JSON.toJSON(response.getBody());
 
         return result;

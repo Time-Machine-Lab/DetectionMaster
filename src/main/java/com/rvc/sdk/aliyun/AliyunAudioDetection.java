@@ -3,10 +3,7 @@ package com.rvc.sdk.aliyun;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.Client;
-import com.aliyun.green20220302.models.ImageModerationResponse;
-import com.aliyun.green20220302.models.VoiceModerationRequest;
-import com.aliyun.green20220302.models.VoiceModerationResponse;
-import com.aliyun.green20220302.models.VoiceModerationResponseBody;
+import com.aliyun.green20220302.models.*;
 import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.Getter;
@@ -32,6 +29,7 @@ public class AliyunAudioDetection {
     private String secretId;
     private String secretKey;
 
+
     public JSONObject greenAudioDetection(String audioUrl) throws Exception {
         VoiceModerationResponse response = invokeFunction(audioUrl,secretId, secretKey, "green-cip.cn-shanghai.aliyuncs.com");
 
@@ -44,7 +42,30 @@ public class AliyunAudioDetection {
             }
         }
         JSONObject  result =(JSONObject) JSON.toJSON(response.getBody());
+        Map data = (Map) result.get("data");
+        String taskId = (String) data.get("taskId");
 
+
+
+//        结果获取的代码
+        // 检测参数构造。
+        Map<String, String> serviceParameters = new HashMap<>();
+        //公网可访问的URL。
+        System.out.println(taskId);
+        serviceParameters.put("taskId",taskId);
+        Client client = createClient(secretId, secretKey, "green-cip.cn-shanghai.aliyuncs.com");
+        com.aliyun.green20220302.models.VoiceModerationResultRequest voiceModerationResultRequest = new com.aliyun.green20220302.models.VoiceModerationResultRequest()
+                .setService("audio_media_detection")
+                .setServiceParameters(JSON.toJSONString(serviceParameters));;
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        VoiceModerationResultResponse voiceModerationResultResponse = client.voiceModerationResultWithOptions(voiceModerationResultRequest, runtime);
+        VoiceModerationResultResponseBody body = voiceModerationResultResponse.getBody();
+        while (body.code == 280){
+             voiceModerationResultResponse = client.voiceModerationResultWithOptions(voiceModerationResultRequest, runtime);
+             body = voiceModerationResultResponse.getBody();
+        }
+        System.out.println("-------------------------");
+        System.out.println(JSON.toJSONString(body));
         return result;
         // 打印检测结果。
 //            if (response != null) {
@@ -76,6 +97,7 @@ public class AliyunAudioDetection {
 
 
     }
+
 
 
     public static Client createClient(String accessKeyId, String accessKeySecret, String endpoint) throws Exception {
@@ -113,22 +135,22 @@ public class AliyunAudioDetection {
         VoiceModerationResponse response = client.voiceModeration(voiceModerationRequest);
 
 
-        if (response.getStatusCode() == 200) {
-            VoiceModerationResponseBody result = response.getBody();
-            System.out.println(JSON.toJSONString(result));
-            System.out.println("requestId = " + result.getRequestId());
-            System.out.println("code = " + result.getCode());
-            System.out.println("msg = " + result.getMessage());
-            Integer code = result.getCode();
-            if (200 == code) {
-                VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
-                System.out.println("taskId = [" + data.getTaskId() + "]");
-            } else {
-                System.out.println("voice moderation not success. code:" + code);
-            }
-        } else {
-            System.out.println("response not success. status:" + response.getStatusCode());
-        }
+//        if (response.getStatusCode() == 200) {
+//            VoiceModerationResponseBody result = response.getBody();
+//            System.out.println(JSON.toJSONString(result));
+//            System.out.println("requestId = " + result.getRequestId());
+//            System.out.println("code = " + result.getCode());
+//            System.out.println("msg = " + result.getMessage());
+//            Integer code = result.getCode();
+//            if (200 == code) {
+//                VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
+//                System.out.println("taskId = [" + data.getTaskId() + "]");
+//            } else {
+//                System.out.println("voice moderation not success. code:" + code);
+//            }
+//        } else {
+//            System.out.println("response not success. status:" + response.getStatusCode());
+//        }
 
         return response;
     }

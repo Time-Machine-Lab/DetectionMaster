@@ -1,22 +1,15 @@
 package com.rvc.pojo.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-
 /**
  * @NAME: DetectionVo
  * @USER: yuech
  * @Description:
- * @DATE: 2023/11/23
+ * @DATE: 2023/11/26
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class DetectionVo {
-
-//    级别   “nonLabel”
-    private String label;
-
+    private String message;
+//审核通过的回调 url
+    private String approvedCallback;
+//审核不通过的回调 url
+    private String rejectedCallback;
 }
