@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static com.rvc.constant.Constants.EXCHANGE_TOPICS_INFORM;
+import static com.rvc.constant.DetectionConstants.EXCHANGE_TOPICS_INFORM;
 
 
 @SpringBootTest
