@@ -1,12 +1,12 @@
 package com.rvc.constant;
 
 /**
- * @NAME: DetectionConstants
+ * @NAME: Constants
  * @USER: yuech
  * @Description:
  * @DATE: 2023/11/23
  */
-public class DetectionConstants {
+public class Constants {
 
     public static final String EXCHANGE_TOPICS_INFORM="exchange_topics_inform";
 
@@ -24,9 +24,4 @@ public class DetectionConstants {
     public static final String ROUTINGKEY_AUDIO="inform.#.audio.#";
 
     public static final String ROUTINGKEY_IMAGE="inform.#.image.#";
-
-
-    public static final Integer STATUS_DO_SHOW = 1;
-
-    public static final Integer STATUS_NOT_SHOW = 0;
 }
