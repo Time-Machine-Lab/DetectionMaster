@@ -1,20 +1,24 @@
+#测试环境
 server:
-  port: 8080
+  port: ${SERVER_PORT:10500}
 
-
-#  腾讯云
-tcyun:
-  secretId: 
-  secretKey: 
-
-
-#阿里云
-#aliyun:
-#  secretId:
-#  secretKey: 
-
+spring:
+  config:
+    import: classpath:you-cant-see-that.yml
+  rabbitmq:
+    host: ${RABBITMQ_HOST:ENC(yMFBFt6gkRargfjdfQRaLbQIj5k9HClY)}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${MQ_USERNAME:ENC(KoxmBnemAL30cCxMbCvVdA==)}
+    password: ${MQ_PASSWORD:ENC(bbi+chmzj/IqpNltm5VJxfRHVb767r2PppNXQsOHgVM=)}
+    virtualHost: /
 
 #阿里云ak
 aliyun:
-  secretId: 
-  secretKey: 
+  secretId: ${ALIYUN_SID:ENC(5VkDvvVEoAbgREvmA4OcyxxoWcFCkmLEl1VilZsTmTDD4k+Hj/pnJQ==)}
+  secretKey: ${ALIYUN_KEY:ENC(i0sSiBRWkVeSF9UFLz10nEztfXNoT8eNvRLNNB9zwSpYMXZip2aC7g==)}
+
+
+
+
+
+
