@@ -1,11 +1,12 @@
 package com.rvc.service;
 
-import com.rvc.pojo.ResponseResult;
+
+import com.rvc.pojo.DetectionResult;
 
 public interface DetectionService {
-    public ResponseResult calculateTextDetection();
+    public DetectionResult calculateTextDetection();
 
-    public ResponseResult calculateImageDetection();
+    public DetectionResult calculateImageDetection();
 
-    public ResponseResult calculateAudioDetection();
+    public DetectionResult calculateAudioDetection();
 }

@@ -3,10 +3,8 @@ package com.rvc.sdk.aliyun;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.Client;
-import com.aliyun.green20220302.models.ImageModerationResponse;
 import com.aliyun.green20220302.models.TextModerationRequest;
 import com.aliyun.green20220302.models.TextModerationResponse;
-import com.aliyun.green20220302.models.TextModerationResponseBody;
 import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.Getter;
@@ -28,7 +26,7 @@ import java.util.UUID;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "aliyun")//报错是正常的
-public class AliyunTextDetection {
+public class AliyunTextDetection{
     private String secretId;
     private String secretKey;
 
@@ -65,34 +63,6 @@ public class AliyunTextDetection {
         JSONObject  result =(JSONObject) JSON.toJSON(response.getBody());
 
         return result;
-        // 打印检测结果。
-//            if (response != null) {
-//                if (response.getStatusCode() == 200) {
-//                    ImageModerationResponseBody body = response.getBody();
-//                    System.out.println("requestId=" + body.getRequestId());
-//                    System.out.println("code=" + body.getCode());
-//                    System.out.println("msg=" + body.getMsg());
-//                    if (body.getCode() == 200) {
-//                        ImageModerationResponseBody.ImageModerationResponseBodyData data = body.getData();
-//                        System.out.println("dataId=" + data.getDataId());
-//                        List<ImageModerationResponseBody.ImageModerationResponseBodyDataResult> results = data.getResult();
-//                        for (ImageModerationResponseBody.ImageModerationResponseBodyDataResult result : results) {
-//                            System.out.println("label=" + result.getLabel());
-//                            System.out.println("confidence=" + result.getConfidence());
-//                        }
-//                    } else {
-//                        System.out.println("image moderation not success. code:" + body.getCode());
-//                    }
-//                } else {
-//                    System.out.println("response not success. status:" + response.getStatusCode());
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-
-
 
     }
 
