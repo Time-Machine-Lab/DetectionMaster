@@ -1,19 +1,17 @@
 #测试环境
 server:
-  port: ${SERVER_PORT:10500}
+  port: ${SERVER_PORT:9220}
 
 spring:
   application:
     name: rvc-detection-service
   cloud:
     nacos:
-      server-addr: 117.21.200.55:18848
-      username: nacos
-      password: keKEaiai5201314
+      server-addr: ${NACOSADDR:ENC(mIQ9vQuo2M25EgeOZZwW4nYMACtogiyMHAI0Oh/Ypfc=)}
+      username: ${NACOSUSERNAME:ENC(TbWnEnWk1SO/FFv/yPAH/A==)}
+      password: ${NACOSPASSWORD:ENC(6ENawsNxgqHgbcrlhIQd+9rKWQl0Z+0G)}
       config:
         file-extension: yaml
-
-
 
 
   #  cloud:
