@@ -1,5 +1,6 @@
 package com.rvc;
 
+import org.apache.logging.log4j.util.Strings;
 import org.jasypt.encryption.StringEncryptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +18,6 @@ public class EncYMLTest {
 
   @Test
   public void getPass() {
-    System.out.println(encryptor.encrypt("117.21.200.55:18848"));
-    System.out.println(encryptor.encrypt("nacos"));
-    System.out.println(encryptor.encrypt("keKEaiai5201314"));
+    System.out.println(Strings.isBlank(" "));
   }
 }

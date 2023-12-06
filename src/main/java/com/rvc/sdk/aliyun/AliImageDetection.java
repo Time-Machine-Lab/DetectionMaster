@@ -3,12 +3,14 @@ package com.rvc.sdk.aliyun;
 import com.alibaba.fastjson.JSON;
 import com.aliyun.green20220302.Client;
 import com.aliyun.green20220302.models.ImageModerationResponse;
+import com.aliyun.green20220302.models.ImageModerationResponseBody;
 import com.aliyun.green20220302.models.TextModerationResponse;
 import com.aliyun.teautil.models.RuntimeOptions;
 import com.rvc.sdk.AbstractAliDetection;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,6 +50,29 @@ public class AliImageDetection extends AbstractAliDetection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if (response != null) {
+            if (response.getStatusCode() == 200) {
+                ImageModerationResponseBody body = response.getBody();
+                System.out.println("requestId=" + body.getRequestId());
+                System.out.println("code=" + body.getCode());
+                System.out.println("msg=" + body.getMsg());
+                if (body.getCode() == 200) {
+                    ImageModerationResponseBody.ImageModerationResponseBodyData data = body.getData();
+                    System.out.println("dataId=" + data.getDataId());
+                    List<ImageModerationResponseBody.ImageModerationResponseBodyDataResult> results = data.getResult();
+                    for (ImageModerationResponseBody.ImageModerationResponseBodyDataResult result : results) {
+                        System.out.println("label=" + result.getLabel());
+                        System.out.println("confidence=" + result.getConfidence());
+                    }
+                } else {
+                    System.out.println("image moderation not success. code:" + body.getCode());
+                }
+            } else {
+                System.out.println("response not success. status:" + response.getStatusCode());
+            }
+        }
+
         return response;
     }
 

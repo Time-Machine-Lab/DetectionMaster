@@ -1,24 +1,21 @@
 package com.rvc.sdk;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.Client;
-import com.aliyun.green20220302.models.TextModerationResponse;
+import com.aliyun.green20220302.models.VoiceModerationResultRequest;
+import com.aliyun.green20220302.models.VoiceModerationResultResponse;
+import com.aliyun.green20220302.models.VoiceModerationResultResponseBody;
 import com.aliyun.tea.TeaModel;
 import com.aliyun.teaopenapi.models.Config;
-import com.rvc.feign.CommentApi;
-import com.rvc.pojo.CommentStatusDto;
-import com.rvc.pojo.DetectionTaskDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.minidev.json.JSONObject;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
-import static com.rvc.constant.DetectionConstant.STATUS_DO_SHOW;
-import static com.rvc.constant.DetectionConstant.STATUS_NOT_SHOW;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @NAME: AbstractAliDetection
@@ -31,10 +28,43 @@ import static com.rvc.constant.DetectionConstant.STATUS_NOT_SHOW;
 @Component
 @ConfigurationProperties(prefix = "aliyun")//报错是正常的
 public abstract class AbstractAliDetection {
+
     private String secretId;
     private String secretKey;
+    public String getRes(String taskId) throws Exception {
+        Client client = createClient(secretId, secretKey, "green-cip.cn-shanghai.aliyuncs.com");
+        net.minidev.json.JSONObject serviceParameters = new JSONObject();
+        // 提交任务时返回的taskId。
+        System.out.println(taskId);
+        serviceParameters.put("taskId", taskId);
+
+        VoiceModerationResultRequest voiceModerationResultRequest = new VoiceModerationResultRequest();
+        // 检测类型：audio_media_detection表示语音文件检测，live_stream_detection表示语音直播流检测。
+        voiceModerationResultRequest.setService("AUDIO_MEDIA_DETECTION");
+        voiceModerationResultRequest.setServiceParameters(serviceParameters.toJSONString());
 
 
+        VoiceModerationResultResponse response = client.voiceModerationResult(voiceModerationResultRequest);
+        VoiceModerationResultResponseBody result = response.getBody();
+        while (result.getMessage() == "PROCESSING") {
+            response = client.voiceModerationResult(voiceModerationResultRequest);
+            result = response.getBody();
+        }
+        if (200 == result.getCode()) {
+            VoiceModerationResultResponseBody.VoiceModerationResultResponseBodyData data = result.getData();
+            List<VoiceModerationResultResponseBody.VoiceModerationResultResponseBodyDataSliceDetails> sliceDetails = data.getSliceDetails();
+            for (VoiceModerationResultResponseBody.VoiceModerationResultResponseBodyDataSliceDetails sliceDetail : sliceDetails) {
+                String msg = sliceDetail.getLabels();
+                if (!Strings.isBlank(msg)) {
+                    System.out.println(sliceDetail.getLabels());
+                    return sliceDetail.getLabels();
+                }
+            }
+
+        }
+
+        return "nonLabel";
+    }
 
     public TeaModel greenDetection(String content) throws Exception {
         TeaModel response = invokeFunction(content,secretId, secretKey, "green-cip.cn-shanghai.aliyuncs.com");
@@ -57,11 +87,7 @@ public abstract class AbstractAliDetection {
         Config config = new Config();
         config.setAccessKeyId(accessKeyId);
         config.setAccessKeySecret(accessKeySecret);
-        // 设置http代理。
-        //config.setHttpProxy("http://10.10.xx.xx:xxxx");
-        // 设置https代理。
-        //config.setHttpsProxy("https://10.10.xx.xx:xxxx");
-        // 接入区域和地址请根据实际情况修改
+
         config.setEndpoint(endpoint);
         return new Client(config);
     }
@@ -69,22 +95,4 @@ public abstract class AbstractAliDetection {
 
     public  abstract TeaModel invokeFunction(String content, String accessKeyId, String accessKeySecret, String endpoint) throws Exception;
 
-
-    public static void back(Map data, DetectionTaskDto detectionTaskDto,CommentApi commentApi){
-        //        回调函数  使用什么框架调用？  使用一个回调？
-        if ((data.get("labels").equals(""))){
-            CommentStatusDto commentStatusDto = CommentStatusDto.builder()
-                    .id(detectionTaskDto.getId())
-                    .status(STATUS_DO_SHOW)
-                    .build();
-            commentApi.status(commentStatusDto);
-        }else {
-            CommentStatusDto commentStatusDto = CommentStatusDto.builder()
-                    .id(detectionTaskDto.getId())
-                    .status(STATUS_NOT_SHOW)
-                    .violationInformation(JSON.toJSONString(data.get("reason")))
-                    .build();
-            commentApi.status(commentStatusDto);
-        }
-    }
 }
