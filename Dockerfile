@@ -1,5 +1,5 @@
 FROM adoptopenjdk:11-jre-hotspot
-COPY *.jar /rvc-website.jar
+COPY *.jar /rvc-communication.jar
 
 
 ARG SERVER_PORT
