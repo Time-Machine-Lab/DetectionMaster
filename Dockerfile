@@ -44,4 +44,4 @@ ENV JASYPT_PWD=${JASYPT_PWD}
 
 EXPOSE ${SERVER_PORT}
 
-ENTRYPOINT ["java","-jar","/rvc-website.jar"]
+ENTRYPOINT ["java","-jar","/rvc-communication.jar"]
