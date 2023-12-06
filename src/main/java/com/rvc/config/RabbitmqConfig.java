@@ -9,7 +9,7 @@ import static com.rvc.constant.DetectionConstant.*;
 
 /**
  * @ClassName RabbitmqConfig
- * @Description TODO
+ * @Description 废弃代码
  * @Author yy
  * @Date 2019/12/17 12:35
  * @Version 1.0
