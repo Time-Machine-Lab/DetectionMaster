@@ -23,6 +23,7 @@ spring:
 #        file-extension: yaml
   config:
     import: classpath:you-cant-see-that.yml
+
   rabbitmq:
     host: ${RABBITMQ_HOST:ENC(yMFBFt6gkRargfjdfQRaLbQIj5k9HClY)}
     port: ${RABBITMQ_PORT:5672}

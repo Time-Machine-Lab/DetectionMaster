@@ -66,6 +66,7 @@ public class ReceiveHandler {
             key = TEXT_ROUTER_KEY
     ))
     public void receive_text(Message message) throws Exception {
+        System.out.println("text");
         //转换消息格式
         String content = new String(message.getBody(), StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
