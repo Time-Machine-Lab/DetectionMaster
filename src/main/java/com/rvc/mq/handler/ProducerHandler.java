@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-import static com.rvc.constant.DetectionConstant.EXCHANGE_TOPICS_INFORM;
-import static com.rvc.constant.DetectionConstant.EXCHANGE_TOPICS_STATUS;
+import static com.rvc.constant.DetectionConstant.*;
 
 @Slf4j
 @Component
@@ -18,8 +17,7 @@ public class ProducerHandler {
     RabbitTemplate rabbitTemplate;
 //
     public void submit(Object submit,String type) {
-        String exchangeName ="res.topic";
-        rabbitTemplate.convertAndSend(exchangeName, "res." + type, JSON.toJSONString(submit));
+        rabbitTemplate.convertAndSend(RES_EXCHANGE_NAME, ROUTER_KEY_HEADER + type, JSON.toJSONString(submit));
     }
 
 }

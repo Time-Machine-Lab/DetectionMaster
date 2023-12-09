@@ -60,42 +60,36 @@ public class ReceiveHandler {
     private AliImageDetection aliImageDetection;
 
 
-    //监听text队列
-//    @RabbitListener(queues = {QUEUE_INFORM_TEXT})
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = "detection.text"),
-            exchange = @Exchange(name = "detection.topic",type = ExchangeTypes.TOPIC),
-            key = "detection.text"
+            value = @Queue(name = TEXT_QUEUE_NAME),
+            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+            key = TEXT_ROUTER_KEY
     ))
     public void receive_text(Message message) throws Exception {
-        System.out.println("detection.text");
-
+        //转换消息格式
         String content = new String(message.getBody(), StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
-
         DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
 
+        //获取审核结果
         TextModerationResponse response = (TextModerationResponse) aliTextDetection.greenDetection(detectionTaskDto.getContent());
 
+        //判断结果
         JSONObject result =(JSONObject) JSON.toJSON(response.getBody());
         Map data = (Map) result.get("data");
-
-
-        //        回调函数  使用什么框架调用？  使用一个回调？
         DetectionStatusDto detectionStatusDto = null;
         if (Objects.isNull(data)||data.get("labels").equals("")){
             detectionStatusDto = DetectionStatusDto.builder()
                     .id(detectionTaskDto.getId())
-                    .status(STATUS_DO_SHOW)
+                    .status(DETECTION_SUCCESS)
                     .name(detectionTaskDto.getName())
-                    .violationInformation("nonLabel")
+                    .violationInformation(NONLABEL)
                     .build();
 
-//            commentApi.status(commentStatusDto);
         }else {
             detectionStatusDto = DetectionStatusDto.builder()
                     .id(detectionTaskDto.getId())
-                    .status(STATUS_NOT_SHOW)
+                    .status(DETECTION_FAIL)
                     .name(detectionTaskDto.getName())
                     .violationInformation(JSON.toJSONString(data.get("reason")))
                     .build();
@@ -104,17 +98,13 @@ public class ReceiveHandler {
 
         ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
         producerHandler.submit(detectionStatusDto,"text");
-
-
     }
 
 
-    //监听image队列
-//    @RabbitListener(queues = {QUEUE_INFORM_IMAGE})
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = "detection.image"),
-            exchange = @Exchange(name = "detection.topic",type = ExchangeTypes.TOPIC),
-            key = "detection.image"
+            value = @Queue(name = IMAGE_QUEUE_NAME),
+            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+            key = IMAGE_ROUTER_KEY
     ))
     public void receive_image(Message message) throws Exception {
 
@@ -133,17 +123,17 @@ public class ReceiveHandler {
         ImageModerationResponseBody.ImageModerationResponseBodyData data = body.getData();
         List<ImageModerationResponseBody.ImageModerationResponseBodyDataResult> results = data.getResult();
         for (ImageModerationResponseBody.ImageModerationResponseBodyDataResult result : results) {
-            if ( result.getLabel().equals("nonLabel")){
+            if ( result.getLabel().equals(NONLABEL)){
                 detectionStatusDto = DetectionStatusDto.builder()
                         .id(detectionTaskDto.getId())
-                        .status(STATUS_DO_SHOW)
+                        .status(DETECTION_SUCCESS)
                         .name(detectionTaskDto.getName())
-                        .violationInformation("nonLabel")
+                        .violationInformation(NONLABEL)
                         .build();
             }else {
                 detectionStatusDto = DetectionStatusDto.builder()
                         .id(detectionTaskDto.getId())
-                        .status(STATUS_NOT_SHOW)
+                        .status(DETECTION_FAIL)
                         .name(detectionTaskDto.getName())
                         .violationInformation(result.getLabel())
                         .build();
@@ -156,13 +146,12 @@ public class ReceiveHandler {
     }
 
 
-    //监听audio队列
+
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = "detection.audio"),
-            exchange = @Exchange(name = "detection.topic",type = ExchangeTypes.TOPIC),
-            key = "detection.audio"
+            value = @Queue(name = AUDIO_QUEUE_NAME),
+            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+            key = AUDIO_ROUTER_KEY
     ))
-    @RabbitListener(queues = {QUEUE_INFORM_AUDIO})
     public void receive_audio( Message message) throws Exception {
         String content = new String(message.getBody(), StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -172,7 +161,7 @@ public class ReceiveHandler {
         VoiceModerationResponse response = (VoiceModerationResponse) aliAudioDetection.greenDetection(detectionTaskDto.getContent());
         VoiceModerationResponseBody result = response.getBody();
         VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
-//                System.out.println("taskId = [" + data.getTaskId() + "]");
+
         /**
          * 获取结果
          */
@@ -181,14 +170,14 @@ public class ReceiveHandler {
         if (res == "nonLabel") {
             detectionStatusDto = DetectionStatusDto.builder()
                     .id(detectionTaskDto.getId())
-                    .status(STATUS_DO_SHOW)
+                    .status(DETECTION_SUCCESS)
                     .name(detectionTaskDto.getName())
                     .violationInformation(res)
                     .build();
         } else {
             detectionStatusDto = DetectionStatusDto.builder()
                     .id(detectionTaskDto.getId())
-                    .status(STATUS_NOT_SHOW)
+                    .status(DETECTION_FAIL)
                     .name(detectionTaskDto.getName())
                     .violationInformation(res)
                     .build();
