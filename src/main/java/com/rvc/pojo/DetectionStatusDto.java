@@ -21,6 +21,8 @@ public class DetectionStatusDto {
 //展示状态(是否违规) 1：展示，0：不可展示
     private Integer status;
 
+//    private String labels;
+
     private String violationInformation;
 
     private String name;
