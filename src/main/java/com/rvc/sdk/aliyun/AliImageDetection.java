@@ -1,6 +1,7 @@
 package com.rvc.sdk.aliyun;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.Client;
 import com.aliyun.green20220302.models.ImageModerationResponse;
 import com.aliyun.green20220302.models.ImageModerationResponseBody;
@@ -9,10 +10,7 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import com.rvc.sdk.AbstractAliDetection;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.rvc.constant.DetectionConstant.BASELINECHECK;
 
@@ -24,6 +22,17 @@ import static com.rvc.constant.DetectionConstant.BASELINECHECK;
  */
 @Component
 public class AliImageDetection extends AbstractAliDetection {
+
+    public String  getLabels(ImageModerationResponse response){
+        String labels = "";
+        ImageModerationResponseBody body = response.getBody();
+        ImageModerationResponseBody.ImageModerationResponseBodyData data = body.getData();
+        List<ImageModerationResponseBody.ImageModerationResponseBodyDataResult> result = data.getResult();
+        for (ImageModerationResponseBody.ImageModerationResponseBodyDataResult imageModerationResponseBodyDataResult : result) {
+            labels +=imageModerationResponseBodyDataResult.getLabel();
+        }
+        return labels;
+    }
     @Override
     public ImageModerationResponse invokeFunction(String content, String accessKeyId, String accessKeySecret, String endpoint) throws Exception {
         //注意，此处实例化的client请尽可能重复使用，避免重复建立连接，提升检测性能。

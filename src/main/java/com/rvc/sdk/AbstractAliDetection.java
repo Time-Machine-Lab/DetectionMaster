@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 
+import static com.rvc.constant.DetectionConstant.AUDIO_MEDIA_DETECTION;
+
 /**
  * @NAME: AbstractAliDetection
  * @USER: yuech
@@ -40,7 +42,7 @@ public abstract class AbstractAliDetection {
 
         VoiceModerationResultRequest voiceModerationResultRequest = new VoiceModerationResultRequest();
         // 检测类型：audio_media_detection表示语音文件检测，live_stream_detection表示语音直播流检测。
-        voiceModerationResultRequest.setService("AUDIO_MEDIA_DETECTION");
+        voiceModerationResultRequest.setService(AUDIO_MEDIA_DETECTION);
         voiceModerationResultRequest.setServiceParameters(serviceParameters.toJSONString());
 
 
@@ -50,20 +52,21 @@ public abstract class AbstractAliDetection {
             response = client.voiceModerationResult(voiceModerationResultRequest);
             result = response.getBody();
         }
+
+        String labels = "";
         if (200 == result.getCode()) {
             VoiceModerationResultResponseBody.VoiceModerationResultResponseBodyData data = result.getData();
             List<VoiceModerationResultResponseBody.VoiceModerationResultResponseBodyDataSliceDetails> sliceDetails = data.getSliceDetails();
             for (VoiceModerationResultResponseBody.VoiceModerationResultResponseBodyDataSliceDetails sliceDetail : sliceDetails) {
                 String msg = sliceDetail.getLabels();
                 if (!Strings.isBlank(msg)) {
-                    System.out.println(sliceDetail.getLabels());
-                    return sliceDetail.getLabels();
+                    labels +=sliceDetail.getLabels();
+                    System.out.println();
                 }
             }
 
         }
-
-        return "nonLabel";
+        return labels;
     }
 
     public TeaModel greenDetection(String content) throws Exception {

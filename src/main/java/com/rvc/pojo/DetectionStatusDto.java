@@ -18,12 +18,9 @@ import lombok.NoArgsConstructor;
 public class DetectionStatusDto {
 
     private Long id;
-//展示状态(是否违规) 1：展示，0：不可展示
-    private Integer status;
 
-//    private String labels;
-
-    private String violationInformation;
+//由调用者来判断是否违规
+    private String labels;
 
     private String name;
 }

@@ -1,6 +1,7 @@
 package com.rvc.sdk.aliyun;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.Client;
 import com.aliyun.green20220302.models.TextModerationRequest;
 import com.aliyun.green20220302.models.TextModerationResponse;
@@ -23,6 +24,13 @@ import static com.rvc.constant.DetectionConstant.COMMENT_DETECTION;
 
 @Component
 public class AliTextDetection extends AbstractAliDetection {
+    public String getLabels(TextModerationResponse response){
+        JSONObject result =(JSONObject) JSON.toJSON(response.getBody());
+        Map data = (Map) result.get("data");
+        Object labels = data.get("labels");
+        return (String) labels;
+    }
+
     @Override
     public TextModerationResponse invokeFunction(String content, String accessKeyId, String accessKeySecret, String endpoint) throws Exception {
         //注意，此处实例化的client请尽可能重复使用，避免重复建立连接，提升检测性能。

@@ -74,40 +74,34 @@ public class ReceiveHandler {
            ObjectMapper objectMapper = new ObjectMapper();
            DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
 
-           //获取审核结果
-           TextModerationResponse response = (TextModerationResponse) aliTextDetection.greenDetection(detectionTaskDto.getContent());
+           String labels  = "";
+           int len = detectionTaskDto.getContent().length();
+           //如果内容过长   分段进行审核
+           while (len > 0){
+               //获取审核结果
+               int start = len-400 >0?len-400:0;
+               String text = detectionTaskDto.getContent().substring(start,len);
+               TextModerationResponse response = (TextModerationResponse) aliTextDetection.greenDetection(text);
+               labels += aliTextDetection.getLabels(response);
+               len -=400;
+            }
 
-           //判断结果
-           JSONObject result =(JSONObject) JSON.toJSON(response.getBody());
-           Map data = (Map) result.get("data");
-           DetectionStatusDto detectionStatusDto = null;
-           if (Objects.isNull(data)||data.get("labels").equals("")){
-               detectionStatusDto = DetectionStatusDto.builder()
-                       .id(detectionTaskDto.getId())
-                       .status(DETECTION_SUCCESS)
-                       .name(detectionTaskDto.getName())
-                       .violationInformation(NONLABEL)
-//                    .labels((String) data.get("labels"))
-                       .build();
-
-           }else {
-               detectionStatusDto = DetectionStatusDto.builder()
-                       .id(detectionTaskDto.getId())
-                       .status(DETECTION_FAIL)
-                       .name(detectionTaskDto.getName())
-                       .violationInformation(JSON.toJSONString(data.get("reason")))
-//                    .labels((String) data.get("labels"))
-                       .build();
-
+           if (labels.isBlank()){
+               labels = "nonLabel";
            }
+        DetectionStatusDto  detectionStatusDto = DetectionStatusDto.builder()
+                       .id(detectionTaskDto.getId())
+                       .labels(labels)
+                       .name(detectionTaskDto.getName())
+                       .build();
 
            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
            producerHandler.submit(detectionStatusDto,"text");
        }
-       catch (Exception e){
+       catch (Exception e) {
            log.info("txt err");
        }
-    }
+   }
 
 
     @RabbitListener(bindings = @QueueBinding(
@@ -120,36 +114,21 @@ public class ReceiveHandler {
 
             String content = new String(message.getBody(), StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
-
             DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
-            if (Strings.isBlank(detectionTaskDto.getContent())){
-                return;
-            }
+
 
             ImageModerationResponse response = (ImageModerationResponse) aliImageDetection.greenDetection(detectionTaskDto.getContent());
+            String labels = aliImageDetection.getLabels(response);
 
-            DetectionStatusDto detectionStatusDto = null;
-            ImageModerationResponseBody body = response.getBody();
-            ImageModerationResponseBody.ImageModerationResponseBodyData data = body.getData();
-            List<ImageModerationResponseBody.ImageModerationResponseBodyDataResult> results = data.getResult();
-            for (ImageModerationResponseBody.ImageModerationResponseBodyDataResult result : results) {
-                if ( result.getLabel().equals(NONLABEL)){
-                    detectionStatusDto = DetectionStatusDto.builder()
-                            .id(detectionTaskDto.getId())
-                            .status(DETECTION_SUCCESS)
-                            .name(detectionTaskDto.getName())
-                            .violationInformation(NONLABEL)
-                            .build();
-                }else {
-                    detectionStatusDto = DetectionStatusDto.builder()
-                            .id(detectionTaskDto.getId())
-                            .status(DETECTION_FAIL)
-                            .name(detectionTaskDto.getName())
-                            .violationInformation(result.getLabel())
-                            .build();
-                    break;
-                }
+
+            if (labels.isBlank()){
+                labels = "nonLabel";
             }
+            DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+                    .id(detectionTaskDto.getId())
+                    .name(detectionTaskDto.getName())
+                    .labels(labels)
+                    .build();
 
             ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
             producerHandler.submit(detectionStatusDto,"image");
@@ -179,24 +158,16 @@ public class ReceiveHandler {
            /**
             * 获取结果
             */
-           String res = aliAudioDetection.getRes(data.getTaskId());
-           DetectionStatusDto detectionStatusDto = null;
-           if (res == "nonLabel") {
-               detectionStatusDto = DetectionStatusDto.builder()
-                       .id(detectionTaskDto.getId())
-                       .status(DETECTION_SUCCESS)
-                       .name(detectionTaskDto.getName())
-                       .violationInformation(res)
-                       .build();
-           } else {
-               detectionStatusDto = DetectionStatusDto.builder()
-                       .id(detectionTaskDto.getId())
-                       .status(DETECTION_FAIL)
-                       .name(detectionTaskDto.getName())
-                       .violationInformation(res)
-                       .build();
+           String labels = aliAudioDetection.getRes(data.getTaskId());
 
+           if (labels.isBlank()){
+               labels = "nonLabel";
            }
+           DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+                       .id(detectionTaskDto.getId())
+                       .labels(labels)
+                       .name(detectionTaskDto.getName())
+                       .build();
            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
            producerHandler.submit(detectionStatusDto, "audio");
        }catch (Exception e){
