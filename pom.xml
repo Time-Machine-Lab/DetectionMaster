@@ -70,6 +70,14 @@
 
 
 	<dependencies>
+
+		<!--雪花-->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-captcha</artifactId>
+			<version>5.8.18</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.alibaba.cloud</groupId>
 			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>

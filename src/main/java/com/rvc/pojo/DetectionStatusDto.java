@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DetectionStatusDto {
 
+
+//    private String uuid;
+
     private Long id;
 
 //由调用者来判断是否违规

@@ -17,6 +17,7 @@ import com.rvc.sdk.aliyun.AliTextDetection;
 
 import com.rvc.utils.BeanUtils;
 
+import com.rvc.utils.Uuid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.amqp.core.ExchangeTypes;
@@ -93,6 +94,7 @@ public class ReceiveHandler {
                        .id(detectionTaskDto.getId())
                        .labels(labels)
                        .name(detectionTaskDto.getName())
+                        .uuid(Uuid.getUuid())
                        .build();
 
            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
@@ -128,6 +130,7 @@ public class ReceiveHandler {
                     .id(detectionTaskDto.getId())
                     .name(detectionTaskDto.getName())
                     .labels(labels)
+                    .uuid(Uuid.getUuid())
                     .build();
 
             ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
@@ -167,6 +170,7 @@ public class ReceiveHandler {
                        .id(detectionTaskDto.getId())
                        .labels(labels)
                        .name(detectionTaskDto.getName())
+                       .uuid(Uuid.getUuid())
                        .build();
            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
            producerHandler.submit(detectionStatusDto, "audio");

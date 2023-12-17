@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DetectionTaskDto   {
-//添加状态码
 
+//添加状态码
     private Long id;
 //    内容
     private String content;
