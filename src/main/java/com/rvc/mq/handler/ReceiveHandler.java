@@ -94,7 +94,7 @@ public class ReceiveHandler {
                        .id(detectionTaskDto.getId())
                        .labels(labels)
                        .name(detectionTaskDto.getName())
-                        .uuid(Uuid.getUuid())
+//                        .uuid(Uuid.getUuid())
                        .build();
 
            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
@@ -130,7 +130,7 @@ public class ReceiveHandler {
                     .id(detectionTaskDto.getId())
                     .name(detectionTaskDto.getName())
                     .labels(labels)
-                    .uuid(Uuid.getUuid())
+//                    .uuid(Uuid.getUuid())
                     .build();
 
             ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
@@ -170,7 +170,7 @@ public class ReceiveHandler {
                        .id(detectionTaskDto.getId())
                        .labels(labels)
                        .name(detectionTaskDto.getName())
-                       .uuid(Uuid.getUuid())
+//                       .uuid(Uuid.getUuid())
                        .build();
            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
            producerHandler.submit(detectionStatusDto, "audio");
