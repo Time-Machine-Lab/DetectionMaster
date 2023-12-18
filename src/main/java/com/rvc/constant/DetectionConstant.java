@@ -33,7 +33,7 @@ public class DetectionConstant {
      * 违规说明
      */
 
-    public static final String NONLABEL = "nonLabel";
+    public static final String NON_LABEL = "nonLabel";
 
 //    public static final String EXCHANGE_TOPICS_INFORM="exchange_topics_inform";
 //

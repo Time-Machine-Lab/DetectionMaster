@@ -88,7 +88,7 @@ public class ReceiveHandler {
             }
 
            if (labels.isBlank()){
-               labels = "nonLabel";
+               labels = NON_LABEL;
            }
         DetectionStatusDto  detectionStatusDto = DetectionStatusDto.builder()
                        .id(detectionTaskDto.getId())
@@ -124,7 +124,7 @@ public class ReceiveHandler {
 
 
             if (labels.isBlank()){
-                labels = "nonLabel";
+                labels = NON_LABEL;
             }
             DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
                     .id(detectionTaskDto.getId())
@@ -164,7 +164,7 @@ public class ReceiveHandler {
            String labels = aliAudioDetection.getRes(data.getTaskId());
 
            if (labels.isBlank()){
-               labels = "nonLabel";
+               labels = NON_LABEL;
            }
            DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
                        .id(detectionTaskDto.getId())
