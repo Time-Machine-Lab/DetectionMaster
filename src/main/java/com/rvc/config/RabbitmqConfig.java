@@ -24,6 +24,9 @@
 //        return ExchangeBuilder.topicExchange(RES_EXCHANGE_NAME).durable(true).build();
 //    }
 //
+
+
+
 //    //声明交换机
 //    @Bean(DETECTION_EXCHANGE_NAME)
 //    public Exchange DETECTION_EXCHANGE_TOPICS_INFORM(){
