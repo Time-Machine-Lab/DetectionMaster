@@ -25,7 +25,7 @@
 		<spring-cloud-start.version>3.0.1</spring-cloud-start.version>
 		<mysql.version>8.0.23</mysql.version>
 
-		<nacos.version>2.2.5.RELEASE</nacos.version>
+<!--		<nacos.version>2.2.5.RELEASE</nacos.version>-->
 		<redis.version>2.3.9.RELEASE</redis.version>
 		<boot.version>2.3.9.RELEASE</boot.version>
 		<rockermq.version>2.3.9.RELEASE</rockermq.version>
@@ -40,33 +40,33 @@
 	</properties>
 
 
-	<dependencyManagement>
-		<dependencies>
-		<!--springCloud-->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-dependencies</artifactId>
-			<version>${spring-cloud.version}</version>
-			<type>pom</type>
-			<scope>import</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-bootstrap</artifactId>
-			<version>${spring-cloud-start.version}</version>
-			<type>pom</type>
-			<scope>import</scope>
-		</dependency>
-		<!--nacos的管理依赖-->
-		<dependency>
-			<groupId>com.alibaba.cloud</groupId>
-			<artifactId>spring-cloud-alibaba-dependencies</artifactId>
-			<version>${nacos.version}</version>
-			<type>pom</type>
-			<scope>import</scope>
-		</dependency>
-		</dependencies>
-	</dependencyManagement>
+<!--	<dependencyManagement>-->
+<!--		<dependencies>-->
+<!--		&lt;!&ndash;springCloud&ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-dependencies</artifactId>-->
+<!--			<version>${spring-cloud.version}</version>-->
+<!--			<type>pom</type>-->
+<!--			<scope>import</scope>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-bootstrap</artifactId>-->
+<!--			<version>${spring-cloud-start.version}</version>-->
+<!--			<type>pom</type>-->
+<!--			<scope>import</scope>-->
+<!--		</dependency>-->
+<!--		&lt;!&ndash;nacos的管理依赖&ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>com.alibaba.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-alibaba-dependencies</artifactId>-->
+<!--			<version>${nacos.version}</version>-->
+<!--			<type>pom</type>-->
+<!--			<scope>import</scope>-->
+<!--		</dependency>-->
+<!--		</dependencies>-->
+<!--	</dependencyManagement>-->
 
 
 	<dependencies>
@@ -78,37 +78,37 @@
 			<version>5.8.18</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.alibaba.cloud</groupId>
-			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.alibaba.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
+<!--		</dependency>-->
 
-		<!--nacos的配置管理依赖-->
-		<dependency>
-			<groupId>com.alibaba.cloud</groupId>
-			<artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-		</dependency>
+<!--		&lt;!&ndash;nacos的配置管理依赖&ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>com.alibaba.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-openfeign</artifactId>
-			<version>3.1.4</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-openfeign</artifactId>-->
+<!--			<version>3.1.4</version>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>com.alibaba.cloud</groupId>
-			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.cloud</groupId>
-					<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-loadbalancer</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.alibaba.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<groupId>org.springframework.cloud</groupId>-->
+<!--					<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-loadbalancer</artifactId>-->
+<!--		</dependency>-->
 
 		<!--    	腾讯云内容安全-->
 		<dependency>

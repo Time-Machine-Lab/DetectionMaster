@@ -3,13 +3,18 @@ server:
   port: ${SERVER_PORT:9220}
 
 spring:
-  profiles:
-    active: ${ACTIVE:prod}
   application:
     name: rvc-detection-service
-
   config:
     import: classpath:you-cant-see-that.yml
+  rabbitmq:
+    host: ${RABBITMQ_HOST:ENC(GeHFmRZlNakxPyXWll4d/3YiEbwGKIxI)}
+    port: ${RABBITMQ_PORT:15672}
+    username: ${MQ_USERNAME:ENC(slkxj/szttzOZjcCB7BqDA==)}
+    password: ${MQ_PASSWORD:ENC(lZidxgPqym5Wwxq4lf5//mH2tHIfg/XV3A4TQ0cSNNE=)}
+    virtualHost: /
+
+
 
 #阿里云ak
 aliyun:
