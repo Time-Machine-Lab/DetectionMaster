@@ -105,7 +105,6 @@ public class ReceiveHandler {
        }
    }
 
-
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = IMAGE_QUEUE_NAME),
             exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
@@ -139,8 +138,6 @@ public class ReceiveHandler {
             log.info("img err");
         }
     }
-
-
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = AUDIO_QUEUE_NAME),
@@ -178,9 +175,4 @@ public class ReceiveHandler {
            log.info("audio err");
        }
     }
-
-
-
-
-
 }
