@@ -1,15 +1,15 @@
-#测试环境
-server:
-  port: ${SERVER_PORT:9220}
 
 spring:
-  profiles:
-    active: ${ACTIVE:test}
   application:
     name: rvc-detection-service
-
   config:
     import: classpath:you-cant-see-that.yml
+  rabbitmq:
+    host: ${RABBITMQ_HOST:ENC(yMFBFt6gkRargfjdfQRaLbQIj5k9HClY)}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${MQ_USERNAME:ENC(KoxmBnemAL30cCxMbCvVdA==)}
+    password: ${MQ_PASSWORD:ENC(bbi+chmzj/IqpNltm5VJxfRHVb767r2PppNXQsOHgVM=)}
+    virtualHost: /
 
 #阿里云ak
 aliyun:

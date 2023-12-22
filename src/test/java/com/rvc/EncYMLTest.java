@@ -18,9 +18,5 @@ public class EncYMLTest {
 
   @Test
   public void getPass() {
-
-    System.out.println(encryptor.encrypt("117.21.200.55"));
-    System.out.println(encryptor.encrypt("root"));
-    System.out.println(encryptor.encrypt("genius_server_0704"));
   }
 }
