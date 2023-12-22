@@ -18,5 +18,4 @@ public class ProducerHandler {
     public void submit(Object submit,String type) {
         rabbitTemplate.convertAndSend(RES_EXCHANGE_NAME, ROUTER_KEY_HEADER + type, JSON.toJSONString(submit));
     }
-
 }
