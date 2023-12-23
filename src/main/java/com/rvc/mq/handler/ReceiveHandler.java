@@ -75,6 +75,8 @@ public class ReceiveHandler {
            ObjectMapper objectMapper = new ObjectMapper();
            DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
 
+           System.out.println(detectionTaskDto);
+
            String labels  = "";
            int len = detectionTaskDto.getContent().length();
            //如果内容过长   分段进行审核
@@ -92,6 +94,7 @@ public class ReceiveHandler {
            }
         DetectionStatusDto  detectionStatusDto = DetectionStatusDto.builder()
                        .id(detectionTaskDto.getId())
+//                    .uuid(Uuid.getUuid())
                        .labels(labels)
                        .name(detectionTaskDto.getName())
 //                        .uuid(Uuid.getUuid())
@@ -117,6 +120,8 @@ public class ReceiveHandler {
             ObjectMapper objectMapper = new ObjectMapper();
             DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
 
+            System.out.println(detectionTaskDto);
+
 
             ImageModerationResponse response = (ImageModerationResponse) aliImageDetection.greenDetection(detectionTaskDto.getContent());
             String labels = aliImageDetection.getLabels(response);
@@ -127,6 +132,7 @@ public class ReceiveHandler {
             }
             DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
                     .id(detectionTaskDto.getId())
+//                    .uuid(Uuid.getUuid())
                     .name(detectionTaskDto.getName())
                     .labels(labels)
 //                    .uuid(Uuid.getUuid())
@@ -151,6 +157,8 @@ public class ReceiveHandler {
 
            DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
 
+           System.out.println(detectionTaskDto);
+
            VoiceModerationResponse response = (VoiceModerationResponse) aliAudioDetection.greenDetection(detectionTaskDto.getContent());
            VoiceModerationResponseBody result = response.getBody();
            VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
@@ -165,6 +173,7 @@ public class ReceiveHandler {
            }
            DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
                        .id(detectionTaskDto.getId())
+//                   .uuid(Uuid.getUuid())
                        .labels(labels)
                        .name(detectionTaskDto.getName())
 //                       .uuid(Uuid.getUuid())
