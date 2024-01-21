@@ -6,9 +6,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.models.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
+import com.rvc.designpattern.strategy.DetectionStrategy;
+import com.rvc.designpattern.strategy.impl.AudioDetectionStrategy;
+import com.rvc.designpattern.strategy.impl.ImgDetectionStrategy;
+import com.rvc.designpattern.strategy.impl.TextDetectionStrategy;
 import com.rvc.pojo.DetectionStatusDto;
 import com.rvc.pojo.DetectionTaskDto;
 import com.rvc.sdk.aliyun.AliAudioDetection;
@@ -34,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,135 +59,164 @@ import static com.rvc.constant.DetectionConstant.*;
 public class ReceiveHandler {
 
 
-    @Autowired
-    private AliTextDetection aliTextDetection;
+//    @Autowired
+//    private AliTextDetection aliTextDetection;
+//
+//    @Autowired
+//    private AliAudioDetection aliAudioDetection;
+//
+//    @Autowired
+//    private AliImageDetection aliImageDetection;
+
+    private final Map<String, DetectionStrategy> strategyMap = new HashMap<>();
 
     @Autowired
-    private AliAudioDetection aliAudioDetection;
-
-    @Autowired
-    private AliImageDetection aliImageDetection;
-
-
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = TEXT_QUEUE_NAME),
-            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
-            key = TEXT_ROUTER_KEY
-    ))
-    public void receive_text(Message message) throws Exception {
-       try{
-           //转换消息格式
-           String content = new String(message.getBody(), StandardCharsets.UTF_8);
-           ObjectMapper objectMapper = new ObjectMapper();
-           DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
-
-           System.out.println(detectionTaskDto);
-
-           String labels  = "";
-           int len = detectionTaskDto.getContent().length();
-           //如果内容过长   分段进行审核
-           while (len > 0){
-               //获取审核结果
-               int start = len-400 >0?len-400:0;
-               String text = detectionTaskDto.getContent().substring(start,len);
-               TextModerationResponse response = (TextModerationResponse) aliTextDetection.greenDetection(text);
-               labels += aliTextDetection.getLabels(response);
-               len -=400;
-            }
-
-           if (labels.isBlank()){
-               labels = NON_LABEL;
-           }
-        DetectionStatusDto  detectionStatusDto = DetectionStatusDto.builder()
-                       .id(detectionTaskDto.getId())
-//                    .uuid(Uuid.getUuid())
-                       .labels(labels)
-                       .name(detectionTaskDto.getName())
-//                        .uuid(Uuid.getUuid())
-                       .build();
-
-           ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
-           producerHandler.submit(detectionStatusDto,"text");
-       }
-       catch (Exception e) {
-           log.info("txt err");
-       }
-   }
-
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = IMAGE_QUEUE_NAME),
-            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
-            key = IMAGE_ROUTER_KEY
-    ))
-    public void receive_image(Message message) {
-        try{
-
-            String content = new String(message.getBody(), StandardCharsets.UTF_8);
-            ObjectMapper objectMapper = new ObjectMapper();
-            DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
-
-            System.out.println(detectionTaskDto);
-
-
-            ImageModerationResponse response = (ImageModerationResponse) aliImageDetection.greenDetection(detectionTaskDto.getContent());
-            String labels = aliImageDetection.getLabels(response);
-
-
-            if (labels.isBlank()){
-                labels = NON_LABEL;
-            }
-            DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
-                    .id(detectionTaskDto.getId())
-//                    .uuid(Uuid.getUuid())
-                    .name(detectionTaskDto.getName())
-                    .labels(labels)
-//                    .uuid(Uuid.getUuid())
-                    .build();
-
-            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
-            producerHandler.submit(detectionStatusDto,"image");
-        }catch (Exception e){
-            log.info("img err");
-        }
+    public ReceiveHandler(TextDetectionStrategy textDetectionStrategy, ImgDetectionStrategy imgDetectionStrategy, AudioDetectionStrategy audioDetectionStrategy) {
+        strategyMap.put("text" ,textDetectionStrategy);
+        strategyMap.put("img",imgDetectionStrategy);
+        strategyMap.put("audio",audioDetectionStrategy);
     }
 
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = AUDIO_QUEUE_NAME),
-            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
-            key = AUDIO_ROUTER_KEY
+        value = @Queue(name = DETECTION_QUEUE_NAME),
+        exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+        key = DETECTION_ROUTER_KEY
     ))
-    public void receive_audio( Message message) throws Exception {
-       try{
-           String content = new String(message.getBody(), StandardCharsets.UTF_8);
-           ObjectMapper objectMapper = new ObjectMapper();
-
-           DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
-
-           System.out.println(detectionTaskDto);
-
-           VoiceModerationResponse response = (VoiceModerationResponse) aliAudioDetection.greenDetection(detectionTaskDto.getContent());
-           VoiceModerationResponseBody result = response.getBody();
-           VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
-
-           /**
-            * 获取结果
-            */
-           String labels = aliAudioDetection.getRes(data.getTaskId());
-
-           if (labels.isBlank()){
-               labels = NON_LABEL;
-           }
-           DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
-                       .id(detectionTaskDto.getId())
-//                   .uuid(Uuid.getUuid())
-                       .labels(labels)
-                       .name(detectionTaskDto.getName())
-//                       .uuid(Uuid.getUuid())
-                       .build();
-           ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
-           producerHandler.submit(detectionStatusDto, "audio");
-       }catch (Exception e){
-           log.info("audio err");
-       }
+    public void process(Message message) throws Exception {
+                       //转换消息格式
+       String content = new String(message.getBody(), StandardCharsets.UTF_8);
+       ObjectMapper objectMapper = new ObjectMapper();
+       DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
+       DetectionStrategy detectionStrategy = strategyMap.get(detectionTaskDto.getType());
+       detectionStrategy.process(detectionTaskDto);
     }
+
+
+//
+//    @RabbitListener(bindings = @QueueBinding(
+//            value = @Queue(name = TEXT_QUEUE_NAME),
+//            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+//            key = TEXT_ROUTER_KEY
+//    ))
+//    public void receive_text(Message message) throws Exception {
+//       try{
+//           //转换消息格式
+//           String content = new String(message.getBody(), StandardCharsets.UTF_8);
+//           ObjectMapper objectMapper = new ObjectMapper();
+//           DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
+//
+//
+//           log.info("{}",detectionTaskDto);
+//           System.out.println(detectionTaskDto);
+//
+//
+//           String labels  = "";
+//           int len = detectionTaskDto.getContent().length();
+//           //如果内容过长   分段进行审核
+//           while (len > 0){
+//               //获取审核结果
+//               int start = len-400 >0?len-400:0;
+//               String text = detectionTaskDto.getContent().substring(start,len);
+//               TextModerationResponse response = (TextModerationResponse) aliTextDetection.greenDetection(text);
+//               labels += aliTextDetection.getLabels(response);
+//               len -=400;
+//            }
+//
+//           if (labels.isBlank()){
+//               labels = NON_LABEL;
+//           }
+//        DetectionStatusDto  detectionStatusDto = DetectionStatusDto.builder()
+//                       .id(detectionTaskDto.getId())
+////                    .uuid(Uuid.getUuid())
+//                       .labels(labels)
+//                       .name(detectionTaskDto.getName())
+////                        .uuid(Uuid.getUuid())
+//                       .build();
+//
+//           ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
+//           producerHandler.submit(detectionStatusDto,detectionTaskDto.getRouterKey());
+//       }
+//       catch (Exception e) {
+//           log.info("txt err");
+//       }
+//   }
+//
+//    @RabbitListener(bindings = @QueueBinding(
+//            value = @Queue(name = IMAGE_QUEUE_NAME),
+//            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+//            key = IMAGE_ROUTER_KEY
+//    ))
+//    public void receive_image(Message message) {
+//        try{
+//
+//            String content = new String(message.getBody(), StandardCharsets.UTF_8);
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
+//
+//            log.info("{}",detectionTaskDto);
+//            System.out.println(detectionTaskDto);
+//
+//
+//            ImageModerationResponse response = (ImageModerationResponse) aliImageDetection.greenDetection(detectionTaskDto.getContent());
+//            String labels = aliImageDetection.getLabels(response);
+//
+//
+//            if (labels.isBlank()){
+//                labels = NON_LABEL;
+//            }
+//            DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+//                    .id(detectionTaskDto.getId())
+////                    .uuid(Uuid.getUuid())
+//                    .name(detectionTaskDto.getName())
+//                    .labels(labels)
+////                    .uuid(Uuid.getUuid())
+//                    .build();
+//
+//            ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
+//            producerHandler.submit(detectionStatusDto,"image");
+//        }catch (Exception e){
+//            log.info("img err");
+//        }
+//    }
+//
+//    @RabbitListener(bindings = @QueueBinding(
+//            value = @Queue(name = AUDIO_QUEUE_NAME),
+//            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+//            key = AUDIO_ROUTER_KEY
+//    ))
+//    public void receive_audio( Message message) throws Exception {
+//       try{
+//           String content = new String(message.getBody(), StandardCharsets.UTF_8);
+//           ObjectMapper objectMapper = new ObjectMapper();
+//
+//           DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
+//
+//           log.info("{}",detectionTaskDto);
+//           System.out.println(detectionTaskDto);
+//
+//           VoiceModerationResponse response = (VoiceModerationResponse) aliAudioDetection.greenDetection(detectionTaskDto.getContent());
+//           VoiceModerationResponseBody result = response.getBody();
+//           VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
+//
+//           /**
+//            * 获取结果
+//            */
+//           String labels = aliAudioDetection.getRes(data.getTaskId());
+//
+//           if (labels.isBlank()){
+//               labels = NON_LABEL;
+//           }
+//           DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+//                       .id(detectionTaskDto.getId())
+////                   .uuid(Uuid.getUuid())
+//                       .labels(labels)
+//                       .name(detectionTaskDto.getName())
+////                       .uuid(Uuid.getUuid())
+//                       .build();
+//           ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
+//           producerHandler.submit(detectionStatusDto, "audio");
+//       }catch (Exception e){
+//           log.info("audio err");
+//       }
+//    }
 }

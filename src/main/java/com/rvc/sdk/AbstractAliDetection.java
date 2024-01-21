@@ -37,7 +37,7 @@ public abstract class AbstractAliDetection {
         Client client = createClient(secretId, secretKey, "green-cip.cn-shanghai.aliyuncs.com");
         net.minidev.json.JSONObject serviceParameters = new JSONObject();
         // 提交任务时返回的taskId。
-        System.out.println(taskId);
+//        System.out.println(taskId);
         serviceParameters.put("taskId", taskId);
 
         VoiceModerationResultRequest voiceModerationResultRequest = new VoiceModerationResultRequest();
@@ -61,7 +61,6 @@ public abstract class AbstractAliDetection {
                 String msg = sliceDetail.getLabels();
                 if (!Strings.isBlank(msg)) {
                     labels +=sliceDetail.getLabels();
-                    System.out.println();
                 }
             }
 

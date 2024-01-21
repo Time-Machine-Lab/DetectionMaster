@@ -13,7 +13,16 @@ public class DetectionConstant {
 
     public static final String RES_EXCHANGE_NAME = "res.topic";
 
-    public static final String DETECTION_EXCHANGE_NAME =  "detection.topic";
+
+    /**
+     * 审核服务常量
+     * 审核服务交换机
+     * 审核服务的队列名
+     * 审核服务路由key
+     */
+    public static final String DETECTION_EXCHANGE_NAME = "detection.topic";
+    public static final String DETECTION_QUEUE_NAME = "detection.topic.queue";
+    public static final String DETECTION_ROUTER_KEY = "detection.topic.key";
 
 
 

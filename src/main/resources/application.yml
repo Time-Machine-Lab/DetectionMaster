@@ -4,7 +4,7 @@ server:
 
 spring:
   profiles:
-    active: ${ACTIVE:test}
+    active: ${ACTIVE:prod}
   application:
     name: rvc-detection-service
 
