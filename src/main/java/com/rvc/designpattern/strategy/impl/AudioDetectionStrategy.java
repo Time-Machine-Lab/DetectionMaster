@@ -9,6 +9,7 @@ import com.rvc.pojo.DetectionTaskDto;
 import com.rvc.sdk.aliyun.AliAudioDetection;
 import com.rvc.sdk.aliyun.AliImageDetection;
 import com.rvc.utils.BeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

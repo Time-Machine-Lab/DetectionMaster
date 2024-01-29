@@ -73,7 +73,7 @@ public class ReceiveHandler {
     @Autowired
     public ReceiveHandler(TextDetectionStrategy textDetectionStrategy, ImgDetectionStrategy imgDetectionStrategy, AudioDetectionStrategy audioDetectionStrategy) {
         strategyMap.put("text" ,textDetectionStrategy);
-        strategyMap.put("img",imgDetectionStrategy);
+        strategyMap.put("image",imgDetectionStrategy);
         strategyMap.put("audio",audioDetectionStrategy);
     }
 

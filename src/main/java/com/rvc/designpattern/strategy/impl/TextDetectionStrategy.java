@@ -25,6 +25,7 @@ public class TextDetectionStrategy implements DetectionStrategy {
     private AliTextDetection aliTextDetection;
     @Override
     public void process(DetectionTaskDto detectionTaskDto) throws Exception {
+        System.out.println("text");
         String labels  = "";
         int len = detectionTaskDto.getContent().length();
         //如果内容过长   分段进行审核

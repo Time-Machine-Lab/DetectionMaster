@@ -16,6 +16,6 @@ public class ProducerHandler {
     @Resource
     RabbitTemplate rabbitTemplate;
     public void submit(Object submit,String routerKey) {
-        rabbitTemplate.convertAndSend(DETECTION_EXCHANGE_NAME,routerKey,JSON.toJSONString(submit));
+        rabbitTemplate.convertAndSend("res.topic",routerKey,JSON.toJSONString(submit));
     }
 }
