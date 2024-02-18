@@ -16,6 +16,7 @@ import com.rvc.designpattern.strategy.impl.ImgDetectionStrategy;
 import com.rvc.designpattern.strategy.impl.TextDetectionStrategy;
 import com.rvc.pojo.DetectionStatusDto;
 import com.rvc.pojo.DetectionTaskDto;
+import com.rvc.pojo.DetectionTaskListDto;
 import com.rvc.sdk.aliyun.AliAudioDetection;
 import com.rvc.sdk.aliyun.AliImageDetection;
 import com.rvc.sdk.aliyun.AliTextDetection;
@@ -39,10 +40,9 @@ import org.springframework.stereotype.Component;
 
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.rvc.constant.DetectionConstant.*;
 
@@ -70,6 +70,10 @@ public class ReceiveHandler {
 
     private final Map<String, DetectionStrategy> strategyMap = new HashMap<>();
 
+    // 创建一个固定大小的线程池，大小为5
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+
+
     @Autowired
     public ReceiveHandler(TextDetectionStrategy textDetectionStrategy, ImgDetectionStrategy imgDetectionStrategy, AudioDetectionStrategy audioDetectionStrategy) {
         strategyMap.put("text" ,textDetectionStrategy);
@@ -77,6 +81,7 @@ public class ReceiveHandler {
         strategyMap.put("audio",audioDetectionStrategy);
     }
 
+    //处理单任务
     @RabbitListener(bindings = @QueueBinding(
         value = @Queue(name = DETECTION_QUEUE_NAME),
         exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
@@ -89,6 +94,67 @@ public class ReceiveHandler {
        DetectionTaskDto detectionTaskDto = objectMapper.readValue(content, DetectionTaskDto.class);
        DetectionStrategy detectionStrategy = strategyMap.get(detectionTaskDto.getType());
        detectionStrategy.process(detectionTaskDto);
+    }
+    //处理多任务
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = DETECTION_QUEUE_LIST_NAME),
+            exchange = @Exchange(name = DETECTION_EXCHANGE_NAME,type = ExchangeTypes.TOPIC),
+            key = DETECTION_LIST_ROUTER_KEY
+    ))
+    public void processList(Message message) throws Exception {
+        //转换消息格式
+        String content = new String(message.getBody(), StandardCharsets.UTF_8);
+        ObjectMapper objectMapper = new ObjectMapper();
+        DetectionTaskListDto detectionTaskListDto = objectMapper.readValue(content, DetectionTaskListDto.class);
+        if (detectionTaskListDto.isSync()){
+            Sync(detectionTaskListDto);
+        }else {
+            NoSync(detectionTaskListDto);
+        }
+    }
+
+    /**
+     * 同步
+     * @param detectionTaskListDto
+     */
+    private void Sync(DetectionTaskListDto detectionTaskListDto) {
+        ArrayList<DetectionStatusDto> res = new ArrayList<>();
+        detectionTaskListDto.getTaskList().stream()
+                .forEach(obj ->{
+                    /**
+                     * 依次获取每一个任务的审核结果
+                     * 返回结果
+                     * 一个routerkey
+                     */
+                    DetectionStrategy detectionStrategy = strategyMap.get(obj.getType());
+                    try {
+                        res.add(detectionStrategy.getRes(obj));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        //返回res
+        ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
+        producerHandler.submit(res,detectionTaskListDto.getTaskList().get(0).getRouterKey());
+    }
+
+    /**
+     * 异步
+     * @param detectionTaskListDto
+     */
+    private void NoSync(DetectionTaskListDto detectionTaskListDto) {
+        detectionTaskListDto.getTaskList().stream()
+                .forEach(obj -> executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        DetectionStrategy detectionStrategy = strategyMap.get(obj.getType());
+                        try {
+                            detectionStrategy.process(obj);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }));
     }
 
 

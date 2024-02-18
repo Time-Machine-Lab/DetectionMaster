@@ -24,6 +24,11 @@ public class DetectionConstant {
     public static final String DETECTION_QUEUE_NAME = "detection.topic.queue";
     public static final String DETECTION_ROUTER_KEY = "detection.topic.key";
 
+    public static final String DETECTION_QUEUE_LIST_NAME = "detection.topic.queue.list";
+    public static final String DETECTION_LIST_ROUTER_KEY = "detection.topic.list.key";
+
+
+
 
 
     public static final String ROUTER_KEY_HEADER = "res.";

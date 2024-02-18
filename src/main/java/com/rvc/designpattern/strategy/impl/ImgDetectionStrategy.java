@@ -37,4 +37,18 @@ public class ImgDetectionStrategy implements DetectionStrategy {
         ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
         producerHandler.submit(detectionStatusDto,detectionTaskDto.getRouterKey());
     }
+
+    @Override
+    public DetectionStatusDto getRes(DetectionTaskDto detectionTaskDto) throws Exception {
+        ImageModerationResponse response = (ImageModerationResponse) aliImageDetection.greenDetection(detectionTaskDto.getContent());
+        String labels = aliImageDetection.getLabels(response);
+        if (labels.isBlank()){
+            labels = NON_LABEL;
+        }
+        DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+                .id(detectionTaskDto.getId())
+                .labels(labels)
+                .build();
+        return detectionStatusDto;
+    }
 }

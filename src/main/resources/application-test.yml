@@ -10,7 +10,21 @@ spring:
     username: ${MQ_USERNAME:ENC(KoxmBnemAL30cCxMbCvVdA==)}
     password: ${MQ_PASSWORD:ENC(bbi+chmzj/IqpNltm5VJxfRHVb767r2PppNXQsOHgVM=)}
     virtualHost: /
-
+    publisher-confirm-type: correlated # 生产者消息确认机制为 异步回调 返回回执消息
+    publisher-returns: true # 开启publisher return 机制 路由失败返回
+    listener:
+      simple:
+        prefetch: ${MQ_PREFETCH:5}
+        concurrency: ${MIN_CONCURRENCY:5}
+        max-concurrency: ${MAX_CONCURRENCY:10}
+        acknowledge-mode: auto
+        connection-timeout: 1s # 设置MQ的连接超时时间
+    template:
+      retry:
+        enabled: true # 开启超时重试机制
+        initial-interval: 1000ms # 失败后的初始等待时间
+        multiplier: 1 # 失败后下次的等待时长倍数，下次等待时长 = initial-interval * multiplier
+        max-attempts: 3 # 最大重试次数
 #阿里云ak
 aliyun:
   secretId: ${ALIYUN_SID:ENC(5VkDvvVEoAbgREvmA4OcyxxoWcFCkmLEl1VilZsTmTDD4k+Hj/pnJQ==)}

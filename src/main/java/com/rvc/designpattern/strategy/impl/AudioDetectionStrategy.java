@@ -44,4 +44,21 @@ public class AudioDetectionStrategy implements DetectionStrategy {
         ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
         producerHandler.submit(detectionStatusDto, detectionTaskDto.getRouterKey());
     }
+
+    @Override
+    public DetectionStatusDto getRes(DetectionTaskDto detectionTaskDto) throws Exception {
+        VoiceModerationResponse response = (VoiceModerationResponse) aliAudioDetection.greenDetection(detectionTaskDto.getContent());
+        VoiceModerationResponseBody result = response.getBody();
+        VoiceModerationResponseBody.VoiceModerationResponseBodyData data = result.getData();
+
+        String labels = aliAudioDetection.getRes(data.getTaskId());
+        if (labels.isBlank()){
+            labels = NON_LABEL;
+        }
+        DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+                .id(detectionTaskDto.getId())
+                .labels(labels)
+                .build();
+        return detectionStatusDto;
+    }
 }

@@ -25,7 +25,6 @@ public class TextDetectionStrategy implements DetectionStrategy {
     private AliTextDetection aliTextDetection;
     @Override
     public void process(DetectionTaskDto detectionTaskDto) throws Exception {
-        System.out.println("text");
         String labels  = "";
         int len = detectionTaskDto.getContent().length();
         //如果内容过长   分段进行审核
@@ -46,5 +45,28 @@ public class TextDetectionStrategy implements DetectionStrategy {
                 .build();
         ProducerHandler producerHandler = BeanUtils.getBean(ProducerHandler.class);
         producerHandler.submit(detectionStatusDto,detectionTaskDto.getRouterKey());
+    }
+
+
+    public DetectionStatusDto getRes(DetectionTaskDto detectionTaskDto) throws Exception {
+        String labels  = "";
+        int len = detectionTaskDto.getContent().length();
+        //如果内容过长   分段进行审核
+        while (len > 0){
+            //获取审核结果
+            int start = len-400 >0?len-400:0;
+            String text = detectionTaskDto.getContent().substring(start,len);
+            TextModerationResponse response = (TextModerationResponse) aliTextDetection.greenDetection(text);
+            labels += aliTextDetection.getLabels(response);
+            len -=400;
+        }
+        if (labels.isBlank()){
+            labels = NON_LABEL;
+        }
+        DetectionStatusDto detectionStatusDto = DetectionStatusDto.builder()
+                .id(detectionTaskDto.getId())
+                .labels(labels)
+                .build();
+        return detectionStatusDto;
     }
 }
